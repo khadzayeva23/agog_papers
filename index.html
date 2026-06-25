@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>agog — This week (data-driven)</title>
+<style>
+  /* ===== agog design tokens (inlined so this page is self-contained on deploy) ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@300..800&family=JetBrains+Mono:wght@400..700&display=swap');
+  :root {
+    --ink-900:#14130F; --ink-700:#2E2C25; --ink-500:#5B574A; --ink-300:#8A8472;
+    --paper-0:#FFFFFF; --paper-50:#F8F6EF; --paper-100:#F3F0E7; --paper-200:#E9E5D8; --line-200:#D9D4C6;
+    --acid:#D6FB3D; --acid-deep:#C2E81C; --flag:#E4533A;
+    --surface-page:var(--paper-100);
+    --font-display:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif;
+    --font-sans:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+    --radius-sm:3px; --radius-md:4px; --radius-pill:999px;
+    --shadow-hard-sm:3px 3px 0 var(--ink-900);
+    --ease-out:cubic-bezier(0.22,0.61,0.36,1);
+  }
+  body { font-family: var(--font-sans); }
+</style>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: var(--surface-page); color: var(--text-body); margin: 0; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  img, svg { display: block; }
+  a { text-decoration: none; color: inherit; }
+
+  .eyebrow { font-family: var(--font-sans); font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-500); }
+
+  /* page intro */
+  .intro { padding: 56px 0 8px; }
+  .intro .wordmark { display: inline-flex; align-items: center; gap: 11px; color: var(--ink-900); margin-bottom: 26px; }
+  .intro .wordmark .mk { width: 28px; height: 28px; }
+  .intro .wordmark .wm { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -0.035em; }
+  .intro__note { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-500); background: var(--paper-0); border: 1.5px solid var(--ink-900); border-radius: var(--radius-pill); padding: 7px 14px; box-shadow: var(--shadow-hard-sm); }
+  .intro__note b { color: var(--ink-900); font-family: var(--font-sans); font-weight: 700; }
+
+  /* section heading */
+  .week { padding: 38px 0 92px; }
+  .shead { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
+  .shead h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.03em; color: var(--ink-900); margin: 10px 0 0; text-wrap: balance; }
+  .shead p { font-size: 16px; color: var(--ink-500); max-width: 44ch; margin: 8px 0 0; }
+  .shead__link { font-family: var(--font-sans); font-weight: 700; font-size: 14px; color: var(--ink-900); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: gap .12s ease; }
+  .shead__link:hover { gap: 9px; }
+  .shead__link i { width: 16px; height: 16px; }
+
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  /* research card — links straight to the paper */
+  .pcard { background: var(--paper-0); border: 1.5px solid var(--ink-900); border-radius: var(--radius-md); box-shadow: 5px 5px 0 var(--ink-900); padding: 24px; display: flex; flex-direction: column; transition: transform .16s var(--ease-out), box-shadow .16s var(--ease-out); }
+  a.pcard:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink-900); }
+  .pcard__tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+  .tag { font-family: var(--font-sans); font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 9px; border-radius: var(--radius-sm); line-height: 1; }
+  .tag--solid { background: var(--ink-900); color: var(--paper-0); }
+  .tag--new { background: var(--flag); color: #fff; border-radius: var(--radius-pill); }
+  .tag--src { margin-left: auto; font-family: var(--font-mono); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-300); border: 1px solid var(--line-200); padding: 3px 8px; border-radius: var(--radius-pill); }
+  .pcard h3 { font-family: var(--font-display); font-weight: 700; font-size: 21px; line-height: 1.14; letter-spacing: -0.015em; color: var(--ink-900); margin: 0; }
+  .pcard__by { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .avs { display: inline-flex; }
+  .av { width: 32px; height: 32px; border-radius: 50%; background: var(--paper-200); border: 1px solid var(--line-200); color: var(--ink-700); font-family: var(--font-display); font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; text-transform: uppercase; }
+  .av + .av { margin-left: -8px; box-shadow: 0 0 0 2px var(--paper-0); }
+  .pcard__byinfo .who { font-size: 13px; font-weight: 600; color: var(--ink-700); }
+  .pcard__byinfo .venue { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-300); margin-top: 2px; }
+  .pcard__ab { font-size: 14px; line-height: 1.5; color: var(--ink-700); margin-top: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .pcard__foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 18px; }
+  .pcard__metrics { display: flex; gap: 16px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-500); }
+  .pcard__metrics span { display: inline-flex; align-items: center; gap: 5px; }
+  .pcard__metrics i { width: 14px; height: 14px; }
+  .pcard__open { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--ink-900); }
+  .pcard__open i { width: 15px; height: 15px; }
+  .pcard__sep { border: 0; border-top: 1px solid var(--line-200); margin: 18px 0 0; }
+
+  .state { font-family: var(--font-mono); font-size: 14px; color: var(--ink-500); padding: 40px 0; }
+
+  @media (max-width: 920px) {
+    .cards3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="intro">
+    <div class="wrap">
+      <a class="wordmark" href="/">
+        <span class="mk" data-brain></span>
+        <span class="wm">agog</span>
+      </a>
+      <div>
+        <span class="intro__note"><i data-lucide="database" style="width:15px;height:15px"></i> Rendered live from <b>papers.json</b> — swap that for your database API and this section updates itself.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="week" id="latest">
+    <div class="wrap">
+      <div class="shead">
+        <div>
+          <div class="eyebrow" id="issue-eyebrow">This week</div>
+          <h2>Recent peer-reviewed papers</h2>
+          <p>Every approved paper for the current week, newest first. Click any card to open the source.</p>
+        </div>
+        <a class="shead__link" href="#" id="browse-all">Browse all <i data-lucide="arrow-right"></i></a>
+      </div>
+      <div class="cards3" id="cards">
+        <div class="state">Loading this week's papers…</div>
+      </div>
+    </div>
+  </section>
+
+  <template id="__brain">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <path d="M24 6.5C16.4 6.5 10.6 10.3 9.6 17 4.6 18 3 25 7.2 28.2 4.4 32.4 7.4 38.2 13.4 38 15.2 41 21 41 24 38.6 27 41 32.8 41 34.6 38 40.6 38.2 43.6 32.4 40.8 28.2 45 25 43.4 18 38.4 17 37.4 10.3 31.6 6.5 24 6.5Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M24 8.5C26.2 13.2 21.8 15.6 24 20.2 26.2 24.8 21.8 28.2 24 32.8 25.4 35.8 24 38" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14.5 14.8C18.6 15.6 19 19.4 16 21.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M11.2 26.4C15.4 25.8 17 28.8 14.8 31.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M33.5 14.8C29.4 15.6 29 19.4 32 21.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M36.8 26.4C32.6 25.8 31 28.8 33.2 31.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+  </template>
+
+  <script>
+    // ---- fallback data so the page renders even if fetch is blocked (file://) ----
+    const FALLBACK = {"week_of":"2026-06-22","issue":47,"papers":[
+      {"title":"Sleep spindles gate the consolidation of fear extinction","field":"Neuroscience","authors":"P. Nair, T. Vehkala","initials":["PN","TV"],"venue":"J. Neuroscience","year":2026,"url":"https://www.jneurosci.org/","summary":"Targeted memory reactivation during stage-2 sleep strengthened extinction memories in proportion to spindle density, pointing to a causal role for spindles in overnight emotional regulation.","cites":38,"read_min":8,"is_new":true,"source":"ai","status":"approved"},
+      {"title":"Perceived consensus shapes moral updating more than evidence","field":"Social","authors":"D. Reyes, M. Oduya","initials":["DR","MO"],"venue":"Psychological Science","year":2026,"url":"https://journals.sagepub.com/home/pss","summary":"In a pre-registered study (N = 1,204), beliefs about what most people think predicted moral-belief change above and beyond the strength of the arguments presented.","cites":21,"read_min":5,"is_new":true,"source":"ai","status":"approved"},
+      {"title":"Single-session reappraisal training reduces 3-month rumination","field":"Clinical","authors":"H. Lindqvist, D. Park","initials":["HL","DP"],"venue":"Clinical Psych. Science","year":2026,"url":"https://journals.sagepub.com/home/cpx","summary":"A 40-minute online cognitive-reappraisal protocol produced durable reductions in trait rumination at three-month follow-up in a community sample.","cites":14,"read_min":5,"is_new":true,"source":"manual","status":"approved"},
+      {"title":"Working-memory load attenuates the attentional blink","field":"Cognition","authors":"S. Haid, L. Okafor","initials":["SH","LO"],"venue":"Cognition","year":2026,"url":"https://www.sciencedirect.com/journal/cognition","summary":"Higher concurrent load paradoxically reduced the second-target deficit, suggesting the blink reflects strategic gating rather than a hard processing bottleneck.","cites":9,"read_min":6,"is_new":true,"source":"ai","status":"approved"},
+      {"title":"Daily step count predicts next-day affect in older adults","field":"Health","authors":"R. Mendel, A. Costa","initials":["RM","AC"],"venue":"Health Psychology","year":2026,"url":"https://www.apa.org/pubs/journals/hea","summary":"Within-person increases in ambulatory activity forecast improved positive affect the following day, with the effect strongest among the least active participants.","cites":6,"read_min":7,"is_new":true,"source":"manual","status":"approved"},
+      {"title":"Psychological safety mediates team learning under deadline pressure","field":"Organisational","authors":"J. Falk, N. Rao","initials":["JF","NR"],"venue":"J. Applied Psychology","year":2026,"url":"https://www.apa.org/pubs/journals/apl","summary":"Across 84 product teams, deadline pressure harmed learning behaviours only when psychological safety was low, clarifying when stress helps versus hurts performance.","cites":4,"read_min":6,"is_new":true,"source":"ai","status":"approved"}
+    ]};
+
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    function fmtWeek(iso) {
+      const d = new Date(iso + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function cardHTML(p) {
+      const avs = (p.initials || []).map(i => `<span class="av">${esc(i)}</span>`).join('');
+      const newTag = p.is_new ? `<span class="tag tag--new">New</span>` : '';
+      const src = p.source === 'manual' ? 'Editor pick' : 'AI-surfaced';
+      return `
+        <a class="pcard" href="${esc(p.url)}" target="_blank" rel="noopener">
+          <div class="pcard__tags">
+            <span class="tag tag--solid">${esc(p.field)}</span>
+            ${newTag}
+            <span class="tag--src">${src}</span>
+          </div>
+          <h3>${esc(p.title)}</h3>
+          <div class="pcard__by">
+            <span class="avs">${avs}</span>
+            <span class="pcard__byinfo">
+              <span class="who">${esc(p.authors)}</span>
+              <span class="venue">${esc(p.venue)} · ${esc(p.year)}</span>
+            </span>
+          </div>
+          <p class="pcard__ab">${esc(p.summary)}</p>
+          <hr class="pcard__sep">
+          <div class="pcard__foot">
+            <div class="pcard__metrics">
+              <span><i data-lucide="chevrons-right"></i>${esc(p.cites)} cites</span>
+              <span><i data-lucide="clock"></i>${esc(p.read_min)} min</span>
+            </div>
+            <span class="pcard__open">Read paper <i data-lucide="arrow-up-right"></i></span>
+          </div>
+        </a>`;
+    }
+
+    function render(data) {
+      const approved = (data.papers || []).filter(p => p.status === 'approved');
+      document.getElementById('cards').innerHTML = approved.map(cardHTML).join('') ||
+        `<div class="state">No papers approved for this week yet.</div>`;
+      document.getElementById('issue-eyebrow').textContent =
+        `This week · Issue ${data.issue} · ${fmtWeek(data.week_of)}`;
+      document.getElementById('browse-all').innerHTML =
+        `Browse all ${approved.length} <i data-lucide="arrow-right"></i>`;
+      // re-inject brain mark + icons after DOM regenerates
+      const brainSVG = document.getElementById('__brain').innerHTML;
+      document.querySelectorAll('[data-brain]').forEach(el => { el.innerHTML = brainSVG; });
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    (async () => {
+      try {
+        // Local demo: 'papers.json'. Live: point this at your serverless proxy, e.g. '/api/papers'.
+        const ENDPOINT = '/api/papers';
+        const res = await fetch(ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error('http ' + res.status);
+        render(await res.json());
+      } catch (e) {
+        render(FALLBACK);
+      }
+    })();
+  </script>
+</body>
+</html>
