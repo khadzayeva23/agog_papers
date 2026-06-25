@@ -76,8 +76,26 @@
 
   .state { font-family: var(--font-mono); font-size: 14px; color: var(--ink-500); padding: 40px 0; }
 
+  /* ---------- newsletter ---------- */
+  .digest { background: var(--acid); margin-top: 8px; }
+  .digest__in { padding: 64px 0; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+  .digest h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 4vw, 52px); line-height: 0.98; letter-spacing: -0.035em; color: var(--ink-900); margin: 0; }
+  .digest p { font-size: 16px; color: var(--ink-900); opacity: 0.78; margin: 14px 0 0; max-width: 40ch; }
+  .digest__form { display: flex; flex-direction: column; gap: 10px; }
+  .digest__row { display: flex; gap: 10px; }
+  .digest input[type=email] { height: 52px; width: 280px; border: 1.5px solid var(--ink-900); border-radius: var(--radius-md); background: var(--paper-100); padding: 0 16px; font-family: var(--font-sans); font-size: 16px; color: var(--ink-900); }
+  .digest input[type=email]::placeholder { color: var(--ink-500); }
+  .digest input[type=email]:focus { outline: none; box-shadow: var(--shadow-hard-sm); }
+  .digest__btn { height: 52px; padding: 0 28px; border: 1.5px solid var(--ink-900); border-radius: var(--radius-md); background: var(--ink-900); color: var(--acid); font-family: var(--font-sans); font-weight: 700; font-size: 16px; cursor: pointer; white-space: nowrap; transition: background .12s ease; }
+  .digest__btn:hover { background: var(--ink-700); }
+  .digest__note { font-family: var(--font-mono); font-size: 12px; color: var(--ink-700); }
+  .digest__note a { text-decoration: underline; }
+  .digest__ok { font-family: var(--font-sans); font-size: 17px; font-weight: 600; color: var(--ink-900); }
+
   @media (max-width: 920px) {
     .cards3 { grid-template-columns: 1fr; }
+    .digest__in { grid-template-columns: 1fr; }
+    .digest input[type=email] { width: 100%; }
   }
 </style>
 </head>
@@ -108,6 +126,24 @@
       <div class="cards3" id="cards">
         <div class="state">Loading this week's papers…</div>
       </div>
+    </div>
+  </section>
+
+  <section class="digest" id="newsletter">
+    <div class="wrap digest__in">
+      <div>
+        <h2>Stay curiously informed.</h2>
+        <p>One email every Monday: the week's new peer-reviewed psychology, in plain language. Free, always.</p>
+      </div>
+      <form class="digest__form" id="bd-form"
+            action="https://buttondown.com/api/emails/embed-subscribe/dayana_k"
+            method="post" target="_blank">
+        <div class="digest__row" id="bd-fields">
+          <input type="email" name="email" id="bd-email" placeholder="you@university.edu" aria-label="Email address" required>
+          <button class="digest__btn" type="submit">Subscribe</button>
+        </div>
+        <span class="digest__note">No spam. Unsubscribe anytime. <a href="https://buttondown.com/dayana_k" target="_blank">Powered by Buttondown.</a></span>
+      </form>
     </div>
   </section>
 
@@ -196,6 +232,28 @@
         render(FALLBACK);
       }
     })();
+
+    // ---- newsletter: submit to Buttondown without leaving the page ----
+    (function () {
+      const form = document.getElementById('bd-form');
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('bd-email').value.trim();
+        if (!email) return;
+        try {
+          await fetch(form.action, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email })
+          });
+        } catch (_) { /* no-cors hides the response; the subscribe still registers */ }
+        document.getElementById('bd-fields').innerHTML =
+          '<span class="digest__ok">Thanks — check your inbox to confirm. See you Monday.</span>';
+      });
+    })();
   </script>
 </body>
 </html>
+
